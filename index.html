@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+        <!-- Ni le pongas inspeccionar xd , no funciona en movil  -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para April</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Source Sans Pro', sans-serif;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .mail-container {
+            position: relative;
+            width: 90vw;
+            max-width: 400px;
+            height: 62.5vh;
+            max-height: 250px;
+            perspective: 1500px;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #d4c4b0, #b8a898);
+            border-radius: 8px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .envelope::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/crissxcross.png');
+            opacity: 0.15;
+            border-radius: inherit;
+        }
+        .envelope:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); }
+        .envelope.opening { transform: translateY(-5px); }
+
+        .envelope-flap {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #c5b5a1, #d4c4b0);
+            border-radius: 8px;
+            transform-origin: top;
+            transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 2;
+            clip-path: polygon(0 0, 100% 0, 50% 75%, 0 0);
+        }
+        .envelope.open .envelope-flap { transform: rotateX(-180deg); }
+
+        .wax-seal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, #f1c40f, #f39c12);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            z-index: 3;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .wax-seal:hover { box-shadow: 0 0 25px rgba(241, 196, 15, 0.9); transform: translate(-50%, -50%) scale(1.1); }
+        .wax-seal.shattered { opacity: 0; pointer-events: none; }
+        .seal-piece {
+            position: absolute;
+            width: 20px; height: 20px;
+            background: radial-gradient(circle, #f1c40f, #f39c12);
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4; pointer-events: none;
+        }
+
+        .letter {
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            background: linear-gradient(to right, #fdfcfb, #f5f2ed);
+            padding: 30px; box-sizing: border-box; border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: translateY(100%) scale(0.95) rotate(-1deg);
+            opacity: 0;
+            transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.6s;
+            z-index: 1; overflow-y: auto;
+        }
+        .letter::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png'); opacity: 0.08;
+        }
+        .envelope.open .letter {
+            transform: translateY(0) scale(1) rotate(0deg);
+            opacity: 1; box-shadow: 0 10px 25px rgba(0,0,0,0.25); filter: brightness(1.05);
+        }
+        .letter h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5em, 4vw, 2em);
+            margin: 0 0 15px 0;
+            color: #5d4037; text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+        #message {
+            font-size: clamp(0.9em, 2.5vw, 1.1em);
+            line-height: 1.7; color: #4e342e; min-height: 80px; text-align: center;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.03);
+        }
+        .signature { text-align: right; margin-top: 20px; font-style: italic; color: #795548; text-shadow: 1px 1px 1px rgba(0,0,0,0.03); }
+        .postscript {
+            font-size: 0.9em; font-style: italic; color: #8a7967; text-align: left; margin-top: 15px;
+            opacity: 0; transform: translateY(10px);
+            transition: all 0.6s ease 0.2s;
+        }
+        .postscript.visible { opacity: 1; transform: translateY(0); }
+
+        /* --- BOTONES (solo ✓) --- */
+        #buttons-container {
+            display: flex; justify-content: center; gap: 30px; margin-top: 20px;
+            opacity: 0; transform: scale(0.9); transition: all 0.6s ease;
+        }
+        #buttons-container.visible { opacity: 1; transform: scale(1); }
+        .seal-btn {
+            width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer;
+            font-size: 24px; color: white; transition: all 0.3s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        #btn-yes { background: #3498db; }
+        .seal-btn:hover { transform: scale(1.1); }
+        .seal-btn:active { transform: scale(0.95); }
+
+        .final-message {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; color: #ecf0f1; opacity: 0; pointer-events: none; z-index: 10; transition: opacity 1s ease;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .final-message h2 { font-family: 'Playfair Display', serif; font-size: 2.5em; margin: 0; }
+        .final-message p  { font-family: 'Source Sans Pro', sans-serif; font-size: 1.2em; color: #bdc3c7; max-width: 300px; }
+        #success-message h2 { color: #3498db; }
+
+        #success-message img {
+            width: 120px; height: 120px; border-radius: 50%; border: 5px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); margin-bottom: 20px; opacity: 0; transform: scale(0.8);
+            transition: all 0.6s ease 0.4s;
+        }
+        #success-message[style*="opacity: 1"] img { opacity: 1; transform: scale(1); }
+
+        .confetti {
+            position: fixed; width: 10px; height: 10px; background: #f1c40f;
+            animation: confetti-fall 6s linear forwards; pointer-events: none;
+        }
+        @keyframes confetti-fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div class="mail-container">
+        <div class="envelope" id="envelope">
+            <div class="envelope-flap"></div>
+            <button class="wax-seal" id="wax-seal" aria-label="Abrir invitación">⭐</button>
+            <div class="letter">
+                <h1>Para April</h1>
+                <p id="message"></p>
+                <div class="signature">—Víctor</div>
+                <p class="postscript">psdt: Me confirmas que no lo relacione a una base de datos xd</p>
+                <div id="buttons-container">
+                    <button id="btn-yes" class="seal-btn">✓</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-message" class="final-message">
+        <img src="https://z-cdn-media.chatglm.cn/files/0d3bec1c-60fb-41b3-a199-65e42f9dc09a_pasted_image_1760305076797.png?auth_key=1791841092-4c6e92934f344e76bdeb7c789a0f103a-0-0aab3f8ec3a2104504d70a545ce6a152" alt="Un niño sonriendo y dando un pulgar arriba">
+        <h2>¡Genial!</h2>
+        <p>Dimelo por Whatshap xd , la cayetano me tiene controlado ... Webi xd </p>
+    </div>
+
+    <audio id="background-music" src="música.mp3" preload="auto" loop playsinline></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const envelope = document.getElementById('envelope');
+            const waxSeal = document.getElementById('wax-seal');
+            const messageEl = document.getElementById('message');
+            const buttonsContainer = document.getElementById('buttons-container');
+            const btnYes = document.getElementById('btn-yes');
+            const successMsg = document.getElementById('success-message');
+            const mailContainer = document.querySelector('.mail-container');
+            const postscriptEl = document.querySelector('.postscript');
+
+            const backgroundMusic = document.getElementById('background-music');
+            const TARGET_VOL = 0.6;
+
+            function fadeVolume(audio, from, to, ms) {
+                const steps = 20;
+                const stepTime = ms / steps;
+                let current = 0;
+                audio.volume = from;
+                const delta = (to - from) / steps;
+                const interval = setInterval(() => {
+                    current++;
+                    audio.volume = Math.max(0, Math.min(1, audio.volume + delta));
+                    if (current >= steps) clearInterval(interval);
+                }, stepTime);
+            }
+
+            const fullText = `Holu April uu,
+estaba pensando que hace tiempo no salimos  un rato. ¿Qué te parece si nos vemos un día de estos para tomar algo o dar una vuelta?`;
+
+            let i = 0;
+            function typeWriter() {
+                if (i < fullText.length) {
+                    messageEl.innerHTML += fullText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 45);
+                } else {
+                    setTimeout(() => {
+                        buttonsContainer.classList.add('visible');
+                        postscriptEl.classList.add('visible');
+                    }, 500);
+                }
+            }
+
+            waxSeal.addEventListener('click', async () => {
+                waxSeal.classList.add('shattered');
+                createSealPieces();
+                envelope.classList.add('opening');
+
+                try {
+                    backgroundMusic.pause();
+                    backgroundMusic.currentTime = 0;
+                } catch (e) {}
+                backgroundMusic.volume = 0;
+                try {
+                    await backgroundMusic.play();
+                } catch (e) {}
+
+                setTimeout(() => {
+                    envelope.classList.add('open');
+                    setTimeout(() => fadeVolume(backgroundMusic, 0, TARGET_VOL, 1200), 600);
+                    setTimeout(typeWriter, 1200);
+                }, 600);
+            });
+
+            function createSealPieces() {
+                for (let i = 0; i < 6; i++) {
+                    const piece = document.createElement('div');
+                    piece.classList.add('seal-piece');
+                    envelope.appendChild(piece);
+
+                    const angle = (i * 60) * (Math.PI / 180);
+                    const velocity = 150 + Math.random() * 100;
+                    const tx = Math.cos(angle) * velocity;
+                    const ty = Math.sin(angle) * velocity;
+
+                    piece.animate([
+                        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                        { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`, opacity: 0 }
+                    ], {
+                        duration: 800,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        fill: 'forwards'
+                    });
+                    setTimeout(() => piece.remove(), 800);
+                }
+            }
+
+            btnYes.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mailContainer.style.transition = 'all 1.5s ease-out';
+                mailContainer.style.transform = 'translateY(-200px) scale(0.8) rotate(10deg)';
+                mailContainer.style.opacity = '0';
+                createConfetti();
+                if (backgroundMusic.paused) backgroundMusic.play().catch(() => {});
+                setTimeout(() => { successMsg.style.opacity = '1'; }, 1000);
+            });
+
+            function createConfetti() {
+                const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f', '#9b59b6'];
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const confettiPiece = document.createElement('div');
+                        confettiPiece.classList.add('confetti');
+                        confettiPiece.style.left = Math.random() * 100 + 'vw';
+                        confettiPiece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                        confettiPiece.style.animationDelay = Math.random() * 3 + 's';
+                        confettiPiece.style.animationDuration = (Math.random() * 3 + 5) + 's';
+                        document.body.appendChild(confettiPiece);
+                        setTimeout(() => confettiPiece.remove(), 8000);
+                    }, i * 50);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
